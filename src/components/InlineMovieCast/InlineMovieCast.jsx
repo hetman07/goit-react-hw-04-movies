@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import fetchMovie from '../../service/tmbdApi';
-import routes from '../routes';
+import routes from '../../routes';
 
 export default class InlineMovieCast extends Component {
     static propTypes = {

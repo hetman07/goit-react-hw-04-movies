@@ -32,7 +32,10 @@ console.log(this.state.movies)
           <ul>
             {movies.map(movie => (
               <li key={movie.id}>
-                <Link to={`${this.props.match.url}movies/${movie.id}`}>{movie.title}</Link>
+                <Link 
+                to={`${this.props.match.url}movies/${movie.id}`}>
+                  {movie.title}
+                  </Link>
               </li>
             ))}
           </ul>

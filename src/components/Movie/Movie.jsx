@@ -1,43 +1,80 @@
-import React, {Component} from 'react';
-import styles from './SearchForm.module.css';
+import React, { Component } from 'react'
+import {Link} from 'react-router-dom'
+import PropTypes from 'prop-types'
+import getQueryParams from '../../utils/queryString'
+
+import SearchMovie from './SearchMovie'
+import fetchMovie from '../../service/tmbdApi';
 
 export default class Movie extends Component {
-    state={inputValue: ''};
-
-    handleChange = (e) => {      
-        this.setState  ({ inputValue: e.target.value });
+    static propTypes = {
+        prop: PropTypes
     };
 
-    handleSubmit = e => {
-        e.preventDefault();      
-        this.props.onSubmit(this.state.inputValue);
-        //в App мы передаем проп = onSubmit - который получит параметр
-        //query - это то значение которое мы вводим в поле инпут this.state.inputValue в файле SearchForm.jsx
+    state = {movieQuery: []};
 
-        // this.setState({inputValue: '' });
-        //поле инпут очищалось
+    componentDidMount() {
+        //в пропах записываем знаечение которое есть в location
+        const { query } = getQueryParams(this.props.location.search);
+ //если запрос есть то делаем феч по запросу
+        if (query) {
+          console.log('Есть квери, можно фечить');
+          this.fetchMovies(query);
+    
+           //return;
+        }
+    //если запроса нет тогда делаем запрос по трендовым фильмам делаем другой запрос
+        // this.fetchShows('batman')
     }
+
+    //если поменялся запрос делаем новый запрос феч с Апишки
+    componentDidUpdate(prevProps, prevState) {
+        const { query: prevQuery } = getQueryParams(prevProps.location.search);
+        const { query: nextQuery } = getQueryParams(this.props.location.search);
+    
+        if (prevQuery !== nextQuery) {
+          this.fetchMovies(nextQuery);
+        }
+      }
+
+ fetchMovies = query => {
+    fetchMovie
+    .fetchMovieQuery(query)
+    .then(movies => {console.log('movieQuery', movies)
+        return (this.setState({movieQuery: movies}))})
+ }
+ 
+ handleChangeQuery = query => {
+    //Добавить запись в history
+    this.props.history.push({
+        ...this.props.location,
+        search: `query=${query}`
+    })
+     }
 
     render() {
         return (
-            <header className={styles.Searchbar}>
-            <form className={styles.SearchForm} 
-                  onSubmit = {this.handleSubmit}    >
-                      <button type="submit" className={styles.SearchFormButton}>
-      <span className={styles.SearchFormButtonLabel}>Search</span>
-    </button>
-                
-                    <input className={styles.SearchFormInput}
-                     type="text"
-                     autoComplete="off"
-                     autoFocus
-                     placeholder="Search films"
-                    value={this.state.inputValue}
-                    onChange = {this.handleChange}             
-                    />
-            </form>
-            </header>
-        );
+            <>
+               <SearchMovie onSubmit={this.handleChangeQuery}/> 
+            {this.state.movieQuery.length > 0 && (
+                <>
+                <h2>Movies with query</h2>
+                <ul>
+{this.state.movieQuery.map(movie => (
+    <li key={movie.id}>
+        <Link 
+        to={{
+            pathname:`${this.props.match.url}/${movie.id}`,
+            state: {from: this.props.location},
+            }}>
+                {movie.title}
+        </Link>
+    </li>
+))}
+                </ul>
+                </>
+            )}
+            </>
+        )
     }
-
 }
