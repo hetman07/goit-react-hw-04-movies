@@ -3,9 +3,13 @@ const http = 'https://api.themoviedb.org/3/';
 const keyApi = '6dd15d0af49ada6394e6fa031610b6f8';
 
 const fetchMovieTrending = () => {
-  return axios
-    .get(`${http}trending/movie/day?api_key=${keyApi}`)
-    .then(response => response.data.results); //обязательно response.data
+  return fetch(`${http}trending/movie/day?api_key=${keyApi}`).then(response =>
+    response.json(),
+  );
+
+  // axios
+  //   .get(`${http}trending/movie/day?api_key=${keyApi}`)
+  //   .then(response => response.data.results);
 };
 //   .catch(function (error) {
 //     // handle error

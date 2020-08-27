@@ -1,21 +1,32 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Switch, Route } from 'react-router-dom';
+import { CircularProgress } from '@material-ui/core';
 
 import routes from '../routes';
 import Layout from './Layout/Layout';
-import Home from './Home/Home';
-import Movie from './Movie/Movie';
-import MovieDetails from './MovieDetails/MovieDetails';
 
 function App() {
   return (
-    <Layout>
-      <Switch>
-        <Route path={routes.home} exact component={Home} />
-        <Route path={routes.movies} exact component={Movie} />
-        <Route path={routes.movieDetails} component={MovieDetails} />
-      </Switch>
-    </Layout>
+    <Suspense fallback={<CircularProgress />}>
+      <Layout>
+        <Switch>
+          <Route
+            path={routes.home}
+            exact
+            component={lazy(() => import('./Home/Home'))}
+          />
+          <Route
+            path={routes.movies}
+            exact
+            component={lazy(() => import('./Movie/Movie'))}
+          />
+          <Route
+            path={routes.movieDetails}
+            component={lazy(() => import('./MovieDetails/MovieDetails'))}
+          />
+        </Switch>
+      </Layout>
+    </Suspense>
   );
 }
 

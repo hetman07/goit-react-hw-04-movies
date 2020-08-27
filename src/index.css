@@ -12,9 +12,12 @@ code {
     monospace;
 }
 
-.Navigation-link {
-  color: blue
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
+
 .Navigation-link-active {
   color: red
 }
