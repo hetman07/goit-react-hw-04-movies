@@ -1,19 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import {
-  List,
-  ListItem,
-  Divider,
-  ListItemText,
-  ListItemAvatar,
-  Avatar,
-  Typography,
-} from '@material-ui/core';
+import { List, ListItem, ListItemText, Typography } from '@material-ui/core';
 
 import fetchMovie from '../../service/tmbdApi';
 import routes from '../../routes';
-import imagePath from '../../assets/pusheen.jpg';
 
 const styles = theme => ({
   root: {
@@ -26,36 +17,26 @@ const styles = theme => ({
   },
 });
 
-class InlineMovieCast extends Component {
+class InlineMovieReview extends Component {
   static propTypes = {
     prop: PropTypes,
   };
-  state = { cast: [] };
+  state = { review: [] };
 
   componentDidMount() {
     fetchMovie
-      .fetchMovieCast(this.props.match.params.movieId)
-      .then(cast => this.setState({ cast }));
+      .fetchMovieReview(this.props.match.params.movieId)
+      .then(review => this.setState({ review }));
   }
 
   render() {
     const { classes } = this.props;
-    const { cast } = this.state;
+    const { review } = this.state;
 
     return (
       <List className={classes.root}>
-        {cast.slice(0, 5).map(actor => (
-          <ListItem key={actor.id} alignItems="flex-start">
-            <ListItemAvatar>
-              <Avatar
-                src={
-                  actor.profile_path
-                    ? routes.path + actor.profile_path
-                    : imagePath
-                }
-                alt={actor.name}
-              />
-            </ListItemAvatar>
+        {review.slice(0, 5).map(view => (
+          <ListItem key={view.id} alignItems="flex-start">
             <ListItemText
               primary="Brunch this weekend?"
               secondary={
@@ -66,7 +47,7 @@ class InlineMovieCast extends Component {
                     className={classes.inline}
                     color="textPrimary"
                   >
-                    {actor.name}
+                    {view.author}
                   </Typography>
                   <Typography
                     component="span"
@@ -74,9 +55,8 @@ class InlineMovieCast extends Component {
                     className={classes.inline}
                     color="textPrimary"
                   >
-                    Character:
+                    {view.content}
                   </Typography>
-                  {actor.character}
                 </>
               }
             />
@@ -86,4 +66,4 @@ class InlineMovieCast extends Component {
     );
   }
 }
-export default withStyles(styles)(InlineMovieCast);
+export default withStyles(styles)(InlineMovieReview);

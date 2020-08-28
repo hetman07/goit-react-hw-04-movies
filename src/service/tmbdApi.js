@@ -6,18 +6,7 @@ const fetchMovieTrending = () => {
   return fetch(`${http}trending/movie/day?api_key=${keyApi}`).then(response =>
     response.json(),
   );
-
-  // axios
-  //   .get(`${http}trending/movie/day?api_key=${keyApi}`)
-  //   .then(response => response.data.results);
 };
-//   .catch(function (error) {
-//     // handle error
-//     console.log(error);
-//   })
-//   .finally(function () {
-//     // always executed
-//   });
 
 const fetchMovieQuery = query => {
   return axios
@@ -39,9 +28,18 @@ const fetchMovieCast = movieId => {
     .then(response => response.data.cast);
 };
 
+const fetchMovieReview = movieId => {
+  return axios
+    .get(
+      `${http}movie/${movieId}/reviews?api_key=${keyApi}&language=en-US&page=1`,
+    )
+    .then(response => response.data.results);
+};
+
 export default {
   fetchMovieTrending,
   fetchMovieDetails,
   fetchMovieCast,
   fetchMovieQuery,
+  fetchMovieReview,
 };
