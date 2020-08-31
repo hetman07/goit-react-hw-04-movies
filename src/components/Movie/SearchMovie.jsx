@@ -1,7 +1,13 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import styles from './SearchForm.module.css';
 
 export default class Movie extends Component {
+  static propTypes = {
+    handleChange: PropTypes.func,
+    handleSubmit: PropTypes.func,
+  };
+
   state = { inputValue: '' };
 
   handleChange = e => {

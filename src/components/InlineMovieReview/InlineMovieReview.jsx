@@ -1,10 +1,16 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+
 import { withStyles } from '@material-ui/core/styles';
-import { List, ListItem, ListItemText, Typography } from '@material-ui/core';
+import {
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+  CircularProgress,
+} from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 
 import fetchMovie from '../../service/tmbdApi';
-import routes from '../../routes';
 
 const styles = theme => ({
   root: {
@@ -18,51 +24,59 @@ const styles = theme => ({
 });
 
 class InlineMovieReview extends Component {
-  static propTypes = {
-    prop: PropTypes,
-  };
-  state = { review: [] };
+  state = { review: [], error: null, isLoading: false };
 
   componentDidMount() {
+    this.setState({ isLoading: true });
+
     fetchMovie
       .fetchMovieReview(this.props.match.params.movieId)
-      .then(review => this.setState({ review }));
+      .then(review => this.setState({ review }))
+      .catch(error => this.setState({ error }))
+      .finally(() => this.setState({ isLoading: false }));
   }
 
   render() {
     const { classes } = this.props;
-    const { review } = this.state;
+    const { review, error, isLoading } = this.state;
 
     return (
-      <List className={classes.root}>
-        {review.slice(0, 5).map(view => (
-          <ListItem key={view.id} alignItems="flex-start">
-            <ListItemText
-              primary="Brunch this weekend?"
-              secondary={
-                <>
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    className={classes.inline}
-                    color="textPrimary"
-                  >
-                    {view.author}
-                  </Typography>
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    className={classes.inline}
-                    color="textPrimary"
-                  >
-                    {view.content}
-                  </Typography>
-                </>
-              }
-            />
-          </ListItem>
-        ))}
-      </List>
+      <>
+        {error && (
+          <div className={classes.rootAlert}>
+            <Alert severity="error"> {error} </Alert>
+          </div>
+        )}
+        {isLoading && <CircularProgress />}
+        {!isLoading && review.length === 0 && (
+          <div className={classes.rootAlert}>
+            <Alert severity="info">
+              We don't have any reviews for this movie.
+            </Alert>
+          </div>
+        )}
+        <List className={classes.root}>
+          {review.slice(0, 5).map(view => (
+            <ListItem key={view.id} alignItems="flex-start">
+              <ListItemText
+                primary={view.author}
+                secondary={
+                  <>
+                    <Typography
+                      component="span"
+                      variant="body2"
+                      className={classes.inline}
+                      color="textPrimary"
+                    >
+                      {view.content}
+                    </Typography>
+                  </>
+                }
+              />
+            </ListItem>
+          ))}
+        </List>
+      </>
     );
   }
 }

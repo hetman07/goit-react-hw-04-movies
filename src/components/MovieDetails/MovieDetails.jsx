@@ -1,15 +1,17 @@
 import React, { Component, Suspense, lazy } from 'react';
-import { Link, Route, Switch } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { NavLink, Route, Switch } from 'react-router-dom';
 import fetchMovie from '../../service/tmbdApi';
 
 import { withStyles } from '@material-ui/core/styles';
 import {
   Grid,
-  Paper,
   Button,
-  ButtonBase,
   Typography,
   CircularProgress,
+  List,
+  ListItem,
+  ListItemText,
 } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 
@@ -34,6 +36,9 @@ const styles = theme => ({
     margin: 'auto',
     maxWidth: 500,
   },
+  title: {
+    margin: theme.spacing(4, 0, 2),
+  },
   image: {
     width: 128,
     height: 128,
@@ -44,12 +49,21 @@ const styles = theme => ({
     maxWidth: '100%',
     maxHeight: '100%',
   },
+  activeButton: {
+    color: 'secondary',
+  },
 });
 
 class ShowDetails extends Component {
+  static propTypes = {
+    handleGoBack: PropTypes.func,
+  };
+
   state = { movie: null, cast: null, error: null, isLoading: false };
 
   componentDidMount() {
+    this.setState({ isLoading: true });
+
     fetchMovie
       .fetchMovieDetails(this.props.match.params.movieId)
       .then(movie => this.setState({ movie }))
@@ -78,7 +92,7 @@ class ShowDetails extends Component {
           </div>
         )}
         {isLoading && <CircularProgress />}
-        {movie.length === 0 && !isLoading && (
+        {!movie && !isLoading && (
           <div className={classes.rootAlert}>
             <Alert severity="info"> No details about films! </Alert>
           </div>
@@ -113,51 +127,57 @@ class ShowDetails extends Component {
                         {movie.title}
                       </Typography>
                       <Typography variant="body2" gutterBottom>
-                        Overwiew
+                        Overview
                       </Typography>
                       <Typography variant="body2" color="textSecondary">
                         {movie.overview}
                       </Typography>
                     </Grid>
                     <Grid item>
-                      <Typography variant="body2" variant="subtitle1">
+                      <Typography variant="h6" className={classes.title}>
                         Genres
                       </Typography>
-                      <ul>
+
+                      <List>
                         {movie.genres.map(genres => (
-                          <li key={genres.id}>
-                            <p>{genres.name}</p>
-                          </li>
+                          <ListItem key={genres.id}>
+                            <ListItemText primary={genres.name} />
+                          </ListItem>
                         ))}
-                      </ul>
+                      </List>
                     </Grid>
 
                     <Grid item>
-                      <Typography variant="body2" variant="subtitle1">
+                      <Typography variant="body2" gutterBottom>
                         Additional information
-                        <ul>
-                          <li>
-                            <Link
-                              to={{
-                                pathname: `${this.props.match.url}/cast`,
-                                state: { from: this.props.location },
-                              }}
-                            >
-                              Cast
-                            </Link>
-                          </li>
-
-                          <li>
-                            <Link
-                              to={{
-                                pathname: `${this.props.match.url}/reviews`,
-                                state: { from: this.props.location },
-                              }}
-                            >
-                              Reviews
-                            </Link>
-                          </li>
-                        </ul>
+                      </Typography>
+                      <Typography variant="body2" variant="subtitle1">
+                        <NavLink
+                          exact
+                          to={{
+                            pathname: `${this.props.match.url}/cast`,
+                            state: { from: this.props.location },
+                          }}
+                          className="Navigation-link"
+                          activeClassName="Navigation-link-active"
+                        >
+                          <Button variant="outlined" color="primary">
+                            Cast
+                          </Button>
+                        </NavLink>
+                        <NavLink
+                          exact
+                          to={{
+                            pathname: `${this.props.match.url}/reviews`,
+                            state: { from: this.props.location },
+                          }}
+                          className="Navigation-link"
+                          activeClassName="Navigation-link-active"
+                        >
+                          <Button variant="outlined" color="primary">
+                            Reviews
+                          </Button>
+                        </NavLink>
                       </Typography>
                     </Grid>
                   </Grid>

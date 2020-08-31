@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+
 import { withStyles } from '@material-ui/core/styles';
 import {
   List,
   ListItem,
-  Divider,
   ListItemText,
   ListItemAvatar,
   Avatar,
   Typography,
+  CircularProgress,
 } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 
 import fetchMovie from '../../service/tmbdApi';
 import routes from '../../routes';
@@ -27,62 +28,63 @@ const styles = theme => ({
 });
 
 class InlineMovieCast extends Component {
-  static propTypes = {
-    prop: PropTypes,
-  };
-  state = { cast: [] };
+  state = { cast: [], error: null, isLoading: false };
 
   componentDidMount() {
+    this.setState({ isLoading: true });
+
     fetchMovie
       .fetchMovieCast(this.props.match.params.movieId)
-      .then(cast => this.setState({ cast }));
+      .then(cast => this.setState({ cast }))
+      .catch(error => this.setState({ error }))
+      .finally(() => this.setState({ isLoading: false }));
   }
 
   render() {
     const { classes } = this.props;
-    const { cast } = this.state;
+    const { cast, error, isLoading } = this.state;
 
     return (
-      <List className={classes.root}>
-        {cast.slice(0, 5).map(actor => (
-          <ListItem key={actor.id} alignItems="flex-start">
-            <ListItemAvatar>
-              <Avatar
-                src={
-                  actor.profile_path
-                    ? routes.path + actor.profile_path
-                    : imagePath
+      <>
+        {error && (
+          <div className={classes.rootAlert}>
+            <Alert severity="error"> {error} </Alert>
+          </div>
+        )}
+        {isLoading && <CircularProgress />}
+        <List className={classes.root}>
+          {cast.slice(0, 5).map(actor => (
+            <ListItem key={actor.id} alignItems="flex-start">
+              <ListItemAvatar>
+                <Avatar
+                  src={
+                    actor.profile_path
+                      ? routes.path + actor.profile_path
+                      : imagePath
+                  }
+                  alt={actor.name}
+                />
+              </ListItemAvatar>
+              <ListItemText
+                primary={actor.name}
+                secondary={
+                  <>
+                    <Typography
+                      component="span"
+                      variant="body2"
+                      className={classes.inline}
+                      color="textPrimary"
+                    >
+                      Character:
+                    </Typography>
+                    {actor.character}
+                  </>
                 }
-                alt={actor.name}
               />
-            </ListItemAvatar>
-            <ListItemText
-              primary="Brunch this weekend?"
-              secondary={
-                <>
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    className={classes.inline}
-                    color="textPrimary"
-                  >
-                    {actor.name}
-                  </Typography>
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    className={classes.inline}
-                    color="textPrimary"
-                  >
-                    Character:
-                  </Typography>
-                  {actor.character}
-                </>
-              }
-            />
-          </ListItem>
-        ))}
-      </List>
+            </ListItem>
+          ))}
+        </List>
+      </>
     );
   }
 }

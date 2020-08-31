@@ -7,7 +7,6 @@ import {
   GridList,
   GridListTile,
   GridListTileBar,
-  ListSubheader,
   IconButton,
   CircularProgress,
 } from '@material-ui/core';
@@ -30,7 +29,7 @@ const styles = theme => ({
 
 class Movie extends Component {
   static propTypes = {
-    prop: PropTypes,
+    handleChangeQuery: PropTypes.func,
   };
 
   state = { movieQuery: [], isLoading: false, error: null };

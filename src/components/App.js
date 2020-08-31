@@ -1,9 +1,9 @@
 import React, { Suspense, lazy } from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import { CircularProgress } from '@material-ui/core';
 
 import routes from '../routes';
-import Layout from './Layout/Layout';
+import Layout from './Layout';
 
 function App() {
   return (
@@ -13,17 +13,18 @@ function App() {
           <Route
             path={routes.home}
             exact
-            component={lazy(() => import('./Home/Home'))}
+            component={lazy(() => import('./Home'))}
           />
           <Route
             path={routes.movies}
             exact
-            component={lazy(() => import('./Movie/Movie'))}
+            component={lazy(() => import('./Movie'))}
           />
           <Route
             path={routes.movieDetails}
-            component={lazy(() => import('./MovieDetails/MovieDetails'))}
+            component={lazy(() => import('./MovieDetails'))}
           />
+          <Redirect to={routes.home} />
         </Switch>
       </Layout>
     </Suspense>
